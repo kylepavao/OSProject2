@@ -1,0 +1,45 @@
+Kyle Pavao ReadMe for OS Project 2
+COMP 350-001
+
+Compile lines to run this project:
+
+arm-none-eabi-gcc -O0 -mfpu=vfp -mfloat-abi=soft -march=armv6zk -mtune=arm1176jzf-s -nostartfiles 
+-g -Wl,-T,rpi.x -I./csud-master/include -o kernel.elf proj2.c proj2-cstartup.c proj2-start.S proj2-cstubs.c -L. -lcsud
+
+arm-none-eabi-objcopy kernel.elf -O binary kernel.img
+
+What my code does and my insight:
+So despite all of the trouble I had initially right out of the gate with the compile line errors, 
+the coded solution of this project has been fairly simple. All of my original problems were fixed after I changed mfloat to soft and 
+put the command to link the csud library at the end of the command. After this I had tested both the return for UsbInitialise() 
+(which bugs me because its spelled wrong) and the number of keyboards attached and from there I finished the project with only a small
+amount of testing and head scratching. My code basically just initializes the USB and checks to see if there are any keyboards 
+attached. Once it does this and everything returns without a problem. The program continually loops by polling the keyboard
+and checking the keys pressed and keys modified with each poll. Since I realized that the code can never truly see if a key and
+modifier were down at the same time (at least not with the keyboard I used) I had to improvise slightly. After each poll, the program
+checks the condition of the keys if there was a key pressed down from A - Z or a number key held down the code outputs 4 dots to 
+the LED, if there was a modifier key held down the code outputs a dash to the LED 3 times and if neither of these cases were met
+but there was at least one key held, the code output a dash followed by a dot 3 times. The tricky part came in the condition
+where both a modifier AND a key from A-Z or a number key were pressed. For these specific cases you will see a for loop that
+basically just waits for a split second without the user even being able to notice (but in a machine's sense of time its a lifetime). 
+After doing this the code polls the keyboard one more time and then checks the keys held or if there was a modifier held depending 
+on whichever was detected first. If the program finds that both conditions of number/letter key and modifier were held down then 
+the code outputs 3 dashes followed by 4 dots to the LED. I just wanted to note that although my code is fully commented for the main
+project file, the other files my working directory were strictly taken from the tutorials so I did not feel the need to comment 
+them since the tutorial alreaddy provides comments for them. Another thing I wanted to relate to you was that if this was not
+intended for a school project and  was meant for actual user interaction I would have included a UsbCheckForChange() call inside each
+iteration of the while loop. My only fear with this is that you would take points off if I did this, since accordding to the 
+documentation this can take a whole second, which in the sense of an operating system is forever. I didn't know which one I should
+have done so I just thought I would mention it here. Other than that I am confident that my code meets 100% of your specifications 
+for the entire project. I also wanted to thank you for all the help you gave me for the early stages of the project. 
+
+Slight Problem I had:
+One very slight problem that I had when writing this, was that I could not make a boolean function that checked to see whether 
+an item within the struct was true. I kept getting an error saying that the types were conflicting. My reasoning for doing this
+was because from a software engineering standpoint, reusing code in multiple places is a headache for anyone who would have to modify the
+code later and since I'll be graduating soon I want to get myself into good habits. The function looked like every other
+boolean function I've ever written in my 8 years of programming, it was just called in an if statement and checked to see if the 
+function was true by using the line in the long if statement that checks to see if a modifier key was held down. For whatever reason
+it would not work. I know that by the time you read this it may be after the final, so have a happy holiday season!
+
+
